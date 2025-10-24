@@ -13,5 +13,6 @@ export default function handler(req, res) {
     ctx.fillText(`Hello, ${username}!`, 40, 70);
 
     res.setHeader("Content-Type", "image/png");
-    canvas.pngStream().pipe(res);
+    canvas.createPNGStream(res);
+    //canvas.pngStream().pipe(res);
 }
