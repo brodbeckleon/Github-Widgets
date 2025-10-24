@@ -1,0 +1,23 @@
+{
+  "name": "github-widgets",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/brodbeckleon/Github-Widgets#readme",
+  "bugs": {
+    "url": "https://github.com/brodbeckleon/Github-Widgets/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brodbeckleon/Github-Widgets.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "canvas": "^3.2.0"
+  }
+}
