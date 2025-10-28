@@ -1,9 +1,7 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "api/widget.js", "use": "@vercel/node" }
-  ],
-  "routes": [
-    { "src": "/api/widget", "dest": "/api/widget.js" }
-  ]
+  "functions": {
+    "api/widget.ts": {
+      "runtime": "@vercel/node"
+    }
+  }
 }

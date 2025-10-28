@@ -1,6 +1,6 @@
 import { createCanvas } from "canvas";
 
-export default function handler(req, res) {
+export default async function handler(req: any, res: any) {
     const { username = "Léon" } = req.query;
     const canvas = createCanvas(400, 120);
     const ctx = canvas.getContext("2d");
@@ -13,6 +13,6 @@ export default function handler(req, res) {
     ctx.fillText(`Hello, ${username}!`, 40, 70);
 
     res.setHeader("Content-Type", "image/png");
-    canvas.createPNGStream(res);
-    //canvas.pngStream().pipe(res);
+    const buffer = canvas.toBuffer("image/png");
+    res.send(buffer);
 }
