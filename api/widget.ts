@@ -1,6 +1,4 @@
-import { createCanvas } from "canvas";
-
-export default async function handler(req: any, res: any) {
+export default function handler(req: any, res: any) {
     // Handle OPTIONS preflight requests
     if (req.method === "OPTIONS") {
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -10,20 +8,21 @@ export default async function handler(req: any, res: any) {
     }
 
     const { username = "Leon" } = req.query;
-    const canvas = createCanvas(400, 120);
-    const ctx = canvas.getContext("2d");
 
-    ctx.fillStyle = "#222";
-    ctx.fillRect(0, 0, 400, 120);
+    // Create SVG string
+    const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="400" height="120">
+      <rect width="400" height="120" fill="#222" />
+      <text x="40" y="70" font-family="Helvetica" font-size="24" fill="#0f0">
+        Hello, ${username}!
+      </text>
+    </svg>
+  `;
 
-    ctx.fillStyle = "#0f0";
-    ctx.font = "Helvetica";
-    ctx.fillText(`Hello, there!`, 40, 70);
-
-    res.setHeader("Content-Type", "image/png");
+    // Send response
+    res.setHeader("Content-Type", "image/svg+xml");
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
     res.setHeader("Cache-Control", "public, max-age=3600");
-    const buffer = canvas.toBuffer("image/png");
-    res.send(buffer);
+    res.send(svg);
 }
