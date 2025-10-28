@@ -1,7 +1,7 @@
 import { createCanvas } from "canvas";
 
 export default function handler(req, res) {
-    const { username = "Anonymous" } = req.query;
+    const { username = "Léon" } = req.query;
     const canvas = createCanvas(400, 120);
     const ctx = canvas.getContext("2d");
 
