@@ -1,9 +1,0 @@
-{
-  "functions": {
-    "api/widget.ts": {
-      "runtime": "@vercel/node",
-      "includeFiles": "api/**"
-    }
-  }
-}
-
