@@ -15,13 +15,14 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "dependencies": {
-    "canvas": "^3.2.0",
-    "path": "^0.12.7"
+    "preview": "npx tsx scripts/preview-stats.ts",
+    "train": "python3 scripts/train.py",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/node": "^24.10.0"
+    "@types/node": "^24.10.0",
+    "@vercel/node": "^32.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
   }
 }
