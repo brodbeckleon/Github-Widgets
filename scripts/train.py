@@ -471,7 +471,7 @@ def field_layer(p, moonlit=False):
 
 TRACK_TILE = 840                                   # wall, embankments and bridges repeat after this
 WALL = 712                                         # the walled-in viaduct runs from here round to x = 96
-BRIDGES = [(250, 418), (574, 686)]                 # long: through truss bridges; multiples of PANEL long
+BRIDGES = [(250, 418)]                             # long: through truss bridges; multiples of PANEL long
 UNDERPASSES = [(146, 194), (488, 522)]             # short: girder bridges over a lane through the embankment
 PANEL = 28
 TRUSS_TOP = 22                                     # top chord, well above the roof and the catenary
@@ -595,13 +595,13 @@ def viaduct_layer(p):
                 L.set(int(mid), y, rd[2])
 
     # embankment: steps up the slope and bushes at its foot
-    for sx in (222, 468):
+    for sx in (222, 468, 628):
         for y in range(DECK + 1, GROUND + 1):
             L.set(sx, y, p["pier3"])
             L.set(sx + 1, y, p["pier3"] if y % 2 else p["pier2"])
             L.set(sx + 2, y, p["pier"] if y % 2 else p["pier2"])
     for cx, r in ((112, 3), (119, 2), (131, 4), (208, 3), (234, 2), (432, 3), (448, 2), (456, 4),
-                  (536, 3), (546, 4), (556, 2), (697, 3), (704, 2)):
+                  (536, 3), (546, 4), (556, 2), (584, 3), (592, 2), (652, 4), (676, 3), (697, 3), (704, 2)):
         for dy in range(-r, 1):
             for dx in range(-r - 1, r + 2):
                 if (dx / (r + 1.5)) ** 2 + (dy / r) ** 2 <= 1:
