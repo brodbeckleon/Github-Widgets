@@ -32,10 +32,10 @@ PALETTES = {
         streak=["#8a7fb0", "#a394b8", "#d3a3a4", "#746fa6"],
         hill=["#3f3f74", "#363a62", "#74506a", "#2e3350"],
         tower="#8d8fae", tower2="#62658a", pole="#5e5648", pole2="#93876c", wire="#39395a",
-        body="#f1ecde", body2="#d9d2c2", roof="#b9b4ab", roof2="#99958f", blue="#1f4aa6",
-        blue2="#163a84", glass="#bcd0e6", cabglass="#4a5d80", door="#e1dbcc", hi="#fffdf6", cap="#fffdf6",
-        cap2="#bdb9b2", head="#ffe9a0", gap="#3a3a48", panto="#2f2f3a", under="#56565f",
-        bogie="#2a2a32", wheel="#6f6f7a",
+        body="#f1ecde", body2="#d9d2c2", roof="#c3c5cc", roof2="#7d8090", blue="#2462b6",
+        blue2="#17437f", glass="#2c3654", cabglass="#1e2436", door="#d3ccbc", hi="#fffdf6",
+        head="#a3abbe", glint="#e3e7f0", gap="#3a3a48", panto="#2f2f3a", under="#1c2a4c",
+        bogie="#22242e", wheel="#666c80",
         rail_hi="#d9b6ac", rail_lo="#a98b88", deck="#9b8b7c", face="#3c2e28",
         shadow="#241c18", hazard="#e0a040", wall="#563a20", wall2="#4a3019",
         pier="#7e6c4a", pier2="#685838", pier3="#93805c", fence="#c9a39d", mesh="#6a4a36",
@@ -43,6 +43,9 @@ PALETTES = {
         white2="#c8c0b2", bottle="#4e7050", bottle2="#90b088", panel="#2a2626", label="#e6833a",
         bin="#d8d2c4", cone="#e0682c", cone2="#f2e6d8", booth="#8b7656", booth2="#6f5c40",
         win="#3d3b6c", sign="#ece6da", ground="#3a2e24",
+        meadow=["#93a060", "#7f8f52", "#6b7c46", "#d2b84e"],            # far, mid, near, rapeseed
+        tree=["#3f5c46", "#2e4638", "#6a8450", "#4e3c30"],              # lit, shade, rim, trunk
+        water=["#7586b8", "#d3aab4", "#55669a"], house=["#d6cbb6", "#56464e", "#3d3b6c"],
         grass=["#836a3c", "#6e5832", "#a08a54", "#5a482a", "#b49c62"],
     ),
     "dark": dict(
@@ -54,9 +57,9 @@ PALETTES = {
         streak=["#2a3462", "#36407a", "#4a5488", "#222a56"],
         hill=["#141a38", "#11172c", "#1f2140", "#0d1224"],
         tower="#4b5274", tower2="#343a58", pole="#2c2a2c", pole2="#48443e", wire="#56608a",
-        body="#c9cdd8", body2="#aeb2c0", roof="#8d91a0", roof2="#727686", blue="#2a50aa",
-        blue2="#1f3e88", glass="#ffd877", cabglass="#56648f", door="#b9bdc9", hi="#e9edf6", cap="#fffbe6",
-        cap2="#e6dfbe", head="#fff6cc", gap="#262a38", panto="#1c1f28", under="#3a3e4a",
+        body="#c9cdd8", body2="#aeb2c0", roof="#9a9eac", roof2="#5e6274", blue="#2a56ae",
+        blue2="#1c3a80", glass="#ffd877", cabglass="#39456e", door="#aeb2c0", hi="#e9edf6",
+        head="#fff6cc", glint="#fffdf0", gap="#262a38", panto="#1c1f28", under="#141c36",
         bogie="#16181e", wheel="#4a4e5a",
         rail_hi="#7a6a78", rail_lo="#5a4e5c", deck="#4a4450", face="#1c1820",
         shadow="#100d12", hazard="#9a7030", wall="#24180e", wall2="#1c130b",
@@ -65,6 +68,9 @@ PALETTES = {
         white2="#d8d2c2", bottle="#9be08a", bottle2="#e8ffd8", panel="#3a3434", label="#ff9a4a",
         bin="#7a766c", cone="#9a4a24", cone2="#b8aca0", booth="#3e3428", booth2="#2e261c",
         win="#ffd36b", sign="#d8d2c0", ground="#16120e",
+        meadow=["#2a3833", "#24312d", "#1d2927", "#444a30"],
+        tree=["#1a292a", "#111c1e", "#2a3d3a", "#18130f"],
+        water=["#1d2b54", "#7f93c8", "#141f42"], house=["#4c4c5c", "#20202c", "#ffd36b"],
         grass=["#3a3220", "#2e2819", "#4a4028", "#241f14", "#55492e"],
     ),
 }
@@ -293,37 +299,42 @@ def poles_layer(p):
     return L
 
 
-# Head of the Series 0, facing right; 16 rows from the roof to the bottom of the skirt.
-#   r roof   h highlight   w ivory   s ivory in shade   B blue   D dark blue   u underside
-#   g cab glass   L headlight   c / C round nose cap
+# Head of the Series 0, drawn facing left (tip in column 0) and mirrored when stamped.
+# Rows run from two above the roof (horn) to one below the skirt (pilot).
+#   h top edge / window frame   w ivory   s ivory in shade   B blue   D dark blue
+#   g cab glass   L lamp disc   i glint on the lamp   e E crew door edge on ivory / on blue
 NOSE = [
-    "rrrrrrrr               ",
-    "hhhhhhhhhh             ",
-    "wwwwwgwwgggh           ",
-    "wwwwwgwwwggggh         ",
-    "BBBBBBBBwwgggghhhh     ",
-    "BBBBBBBBBBwwwwwwwwhh   ",
-    "BBBBBBBBBBBBBwwwwwwwh  ",
-    "BBBBBBBBBBBBBBBLLwwwwh ",
-    "BBBBBBBBBBBBBBBLLwwwwwh",
-    "wwwwwwwwwwwwwwwwwwwwCcc",
-    "wwwwwwwwwwwwwwwwwwwCccc",
-    "wwwwwwwwwwwwwwwwwwwCccc",
-    "ssssssssssssssssssssCC ",
-    "BBBBBBBBBBBBBBBBBBBBBB ",
-    "DDDDDDDDDDDDDDDDDDDDD  ",
-    "uuuuuuuuuuuuuuuuuuuu   ",
+    "                    www   ",
+    "                    w     ",
+    "                   hhhhhhh",
+    "                hhhwwwwwww",
+    "             hhhhgggwwwwww",
+    "           hhgghggggweweww",
+    "        hhhggghgggggBEBEBB",
+    "     hhhwwwwwwwwwBBBBEgEBB",
+    "   hhwwwwwwwwwwBBBBBBEgEBB",
+    "  hwwwwwwwwwwwwBBBBBBEBEBB",
+    " hwwwwwwwwwwwwwwwBBBBEBEBB",
+    "hwwLiwwwwwwwwwwwwwwwweweww",
+    "wwwLLwwwwwwwwwwwwwwwweweww",
+    " swwwwwwwwwwwwwwwwwwweweww",
+    "  sssssssssssssssssssesess",
+    "  BBBBBBBBBBBBBBBBBBBBBBBB",
+    " BBBBBBBBBBBBBBBBBBBBBBBBB",
+    " DDDDDDDDDDDDDDDDDDDDDDDDD",
+    "  BBBBBBB                 ",
 ]
-SIDE = "rhwwBBBBBwwwsBDu"                          # one column of the car body, roof to skirt
+NOSE = [row[::-1] for row in NOSE]
+SIDE = "rrwwBBBBBwwwsBBD"                          # one column of the car body, roof to skirt
 HEAD_X = 216                                       # tip of the nose
 CAR = 100                                          # car length
-LAMP_Y = TOP + 7                                   # headlight rows: LAMP_Y, LAMP_Y + 1
+LAMP_Y = TOP + 9                                   # lamp rows: LAMP_Y, LAMP_Y + 1
 
 
 def draw_train(p):
     L = Layer()
-    key = dict(r="roof", h="hi", w="body", s="body2", B="blue", D="blue2", u="under",
-               g="cabglass", L="head", c="cap", C="cap2")
+    key = dict(r="roof", h="hi", w="body", s="body2", B="blue", D="blue2", g="cabglass",
+               L="head", i="glint", e="door", E="blue2")
     nose_x = HEAD_X - len(NOSE[0]) + 1
     joints = [HEAD_X - CAR, HEAD_X - 2 * CAR]      # the tail runs off-screen to the left
 
@@ -331,41 +342,48 @@ def draw_train(p):
         for r, ch in enumerate(SIDE):
             L.set(x, TOP + r, p[key[ch]])
     for r, row in enumerate(NOSE):
-        assert len(row) == len(NOSE[0])
+        assert len(row) == len(NOSE[0]), row
         for i, ch in enumerate(row):
             if ch != " ":
-                L.set(nose_x + i, TOP + r, p[key[ch]])
+                L.set(nose_x + i, TOP - 2 + r, p[key[ch]])
 
-    # cars: (first column, last column, columns kept free of windows at the front end)
-    cars = [(joints[0] + 1, nose_x - 1, 8), (joints[1] + 1, joints[0] - 1, 10), (-CAR, joints[1] - 1, 10)]
-    for a, b, front in cars:
-        doors = [a + 4] + ([b - 6] if front == 10 else [b - 4])
-        # wide side windows like the first batches of the 0 series
-        x = a + 11
-        while x + 3 <= b - front:
-            L.rect(x, TOP + 5, 4, 3, p["glass"])
-            x += 6
-        for d in doors:
-            L.rect(d, TOP + 2, 3, 2, p["door"])
-            L.rect(d, TOP + 9, 3, 4, p["door"])
-            L.rect(d + 1, TOP + 5, 1, 2, p["glass"])
-        # air-conditioning units along the roof
+    def door(d):
+        for dx in (0, 2):
+            L.rect(d + dx, TOP + 3, 1, 1, p["door"])
+            L.rect(d + dx, TOP + 4, 1, 5, p["blue2"])
+            L.rect(d + dx, TOP + 9, 1, 4, p["door"])
+        L.rect(d + 1, TOP + 5, 1, 2, p["glass"])
+
+    # cars: (first column, last column, is it the head car)
+    cars = [(joints[0] + 1, nose_x - 1, True), (joints[1] + 1, joints[0] - 1, False), (-CAR, joints[1] - 1, False)]
+    for a, b, head in cars:
+        door(a + 4)
+        door(b - 3 if head else b - 6)
+        last = b - 6 if head else b - 10
+        x = a + 10
+        while x + 2 <= last:                       # dark, almost square side windows
+            L.rect(x, TOP + 5, 3, 3, p["glass"])
+            x += 5
         x = a + 9
-        while x + 7 <= b - front:
-            L.rect(x, TOP - 1, 7, 1, p["roof2"])
-            x += 10
-        # bogies
-        for bx in (a + 9, b - 24 if front == 10 else b - 18):
+        while x + 7 <= last:                       # louvres of the roof units
+            for i in (0, 2, 4, 6):
+                L.set(x + i, TOP + 1, p["roof2"])
+            x += 12
+        bogies = (a + 9, b - 18 if head else b - 24)
+        for bx in bogies:
             L.rect(bx, BOT, 15, 1, p["bogie"])
             for wx in (bx + 2, bx + 10):
                 L.rect(wx, BOT, 3, 1, p["wheel"])
+        x = bogies[0] + 19                         # underfloor boxes between the bogies
+        while x + 8 <= bogies[1] - 3:
+            L.rect(x, BOT, 8, 1, p["under"])
+            x += 11
     for g in joints:
-        L.rect(g, TOP - 1, 1, 17, None)
         for y in range(TOP, TOP + 16):
             L.px.pop((g, y), None)
         L.rect(g, TOP + 1, 1, 14, p["gap"])
         for gx in (g - 1, g + 1):                  # car ends in shade
-            L.rect(gx, TOP + 1, 1, 3, p["body2"])
+            L.rect(gx, TOP + 2, 1, 2, p["body2"])
             L.rect(gx, TOP + 9, 1, 3, p["body2"])
 
     # pantograph on the second car, reaching the contact wire
@@ -378,11 +396,85 @@ def draw_train(p):
     return L
 
 
-def viaduct_layer(p):
-    """Parapet, deck and everything under the viaduct (vending machines, fence, cones, booth)."""
+def field_layer(p, moonlit=False):
+    """Meadows, fields, farmhouses and trees behind the viaduct; seen through its open spans."""
     T = 560
     L = Layer(T)
-    piers = [0, 140, 280, 420]
+    m, t, hs = p["meadow"], p["tree"], p["house"]
+    for x in range(T):
+        top = 57 - round(1.5 * math.sin(2 * math.pi * 4 * x / T + 1) + 1.2 * math.sin(2 * math.pi * 11 * x / T)
+                         + 1.5 * hsh(x // 3, 2))
+        for y in range(top, 61):                   # wood at the far end of the fields
+            L.set(x, y, t[2] if y == top and hsh(x, 3) < 0.35 else t[0] if y - top < 2 else t[1])
+        for y in range(61, GROUND + 1):
+            c = m[0] if y < 63 else m[1] if y < 67 else m[2]
+            if y in (63, 67) and (x + y) % 2:
+                c = m[0] if y == 63 else m[1]
+            L.set(x, y, c)
+    for a, b, y0 in ((36, 104, 64), (176, 262, 63), (318, 396, 65), (452, 536, 63)):
+        for y in (y0, y0 + 1):                     # rapeseed strips
+            for x in range(a - 3 * (y - y0), b - 3 * (y - y0)):
+                L.set(x, y, m[3] if (x // 9 + y) % 4 else m[1])
+
+    def house(x):
+        for i, w in enumerate((5, 9, 13)):
+            L.rect(x + 6 - w // 2, 58 + i, w, 1, hs[1])
+        L.rect(x + 1, 61, 11, 4, hs[0])
+        L.rect(x + 9, 61, 3, 4, hs[1] if moonlit else t[3])
+        L.rect(x + 3, 62, 2, 2, hs[2])
+        L.rect(x + 6, 62, 2, 2, hs[2])
+
+    def broadleaf(cx, base, r):
+        L.rect(cx, base - 3, 1, 4, t[3])
+        cy = base - 2 - r
+        for dy in range(-r, r + 1):
+            for dx in range(-int(r * 1.25), int(r * 1.25) + 1):
+                nx, ny = dx / (r * 1.25), dy / r
+                if nx * nx + ny * ny > 1:
+                    continue
+                lit = (0.6 if moonlit else -0.6) * nx - 0.8 * ny
+                c = t[2] if lit > 0.5 and hsh(cx + dx, dy) < 0.7 else t[0] if lit > -0.15 else t[1]
+                L.set(cx + dx, cy + dy, c)
+
+    def cedar(cx, base, h):
+        L.rect(cx, base - 1, 1, 2, t[3])
+        for i in range(h):
+            w = min(i // 3 + (1 if i % 3 == 2 else 0), 4)
+            for dx in range(-w, w + 1):
+                far = dx > 0 if not moonlit else dx < 0
+                rim = (dx == -w if not moonlit else dx == w) and i % 3 == 2
+                L.set(cx + dx, base - 1 - h + i, t[2] if rim else t[1] if far else t[0])
+
+    for hx in (118, 296, 468):
+        house(hx)
+    rnd = random.Random(33)
+    trees = []
+    x = 6
+    while x < T - 8:
+        for _ in range(rnd.choice((1, 1, 2, 3))):
+            trees.append((rnd.randint(63, 69), x, rnd.random() < 0.4))
+            x += rnd.randint(5, 9)
+        x += rnd.randint(14, 44)
+    for base, cx, conifer in sorted(trees):        # far ones first
+        if conifer:
+            cedar(cx, base, 9 + (base - 63))
+        else:
+            broadleaf(cx, base, 3 + (base - 63) // 2)
+    return L
+
+
+def viaduct_layer(p):
+    """Parapet and deck, carried in turn by a walled-in stretch (vending machines, fence, booth),
+    open spans on T-piers and an arch bridge over a river."""
+    T = 560
+    L = Layer(T)
+
+    def walled(x):
+        return x >= 430 or x < 96
+
+    def concrete(x, y, edge=False):
+        return p["pier3"] if edge else p["pier2"] if hsh(x, y // 2) < 0.3 else p["pier"]
+
     for x in range(T):
         # low parapet in front of the wheels, with a joint every few pixels
         L.set(x, RAIL, p["rail_lo"] if x % 7 == 0 else p["rail_hi"])
@@ -390,18 +482,49 @@ def viaduct_layer(p):
         L.set(x, DECK, p["deck"])
         L.rect(x, DECK + 1, 1, 2, p["face"])
         L.set(x, DECK + 3, p["shadow"])
-        # back wall in the shade of the deck
-        for y in range(DECK + 4, GROUND):
-            L.set(x, y, p["wall2"] if y < DECK + 7 or hsh(x // 3, y // 4) < 0.25 else p["wall"])
-        L.set(x, GROUND, p["ground"])
-    for x in range(160, 272):                      # hazard stripes under the bridge section
+        if walled(x):                              # back wall in the shade of the deck
+            for y in range(DECK + 4, GROUND):
+                L.set(x, y, p["wall2"] if y < DECK + 7 or hsh(x // 3, y // 4) < 0.25 else p["wall"])
+            L.set(x, GROUND, p["ground"])
+    for x in range(140, 222):                      # hazard stripes on the girder over the lane
         if x % 5 < 2:
             L.set(x, DECK + 3, p["hazard"])
-    for px in piers:
+
+    for px in (0, 490):                            # pilasters in the wall
         for x in range(px, px + 14):
             for y in range(DECK + 4, GROUND):
-                c = p["pier3"] if x == px else p["pier2"] if hsh(x, y // 2) < 0.3 else p["pier"]
-                L.set(x, y, c)
+                L.set(x, y, concrete(x, y, x == px))
+    for px in (92, 430):                           # where the wall ends
+        for x in range(px, px + 4):
+            for y in range(DECK + 4, GROUND + 1):
+                L.set(x, y, concrete(x, y, x == px))
+    for px in (140, 210):                          # T-piers of the open spans
+        for x in range(px - 4, px + 14):
+            L.set(x, DECK + 4, concrete(x, DECK + 4, x == px - 4))
+        for x in range(px - 2, px + 12):
+            L.set(x, DECK + 5, concrete(x, DECK + 5, x == px - 2))
+        for x in range(px, px + 10):
+            for y in range(DECK + 6, GROUND + 1):
+                L.set(x, y, p["pier2"] if x >= px + 8 else concrete(x, y, x == px))
+
+    # arch bridge: two spans over the river
+    w = p["water"]
+    for a in (290, 360):
+        for x in range(a, a + 60):
+            u = (x - a - 29.5) / 30
+            crown = max(DECK + 5, 69 - round(10 * math.sqrt(max(0.0, 1 - u * u))))
+            for y in range(DECK + 4, crown):
+                L.set(x, y, concrete(x, y, y == crown - 1))
+            if hsh(x // 2, 61) < 0.5:
+                L.set(x, 61, p["tree"][1])         # far bank
+            L.set(x, 62, p["tree"][1])
+            for y in range(max(crown, 63), GROUND + 1):
+                glint = hsh(x // 4 + 31 * y, 7) < 0.13 and y > 64
+                L.set(x, y, w[2] if y == 63 else w[1] if glint else w[0])
+    for px in (280, 350, 420):
+        for x in range(px, px + 10):
+            for y in range(DECK + 4, GROUND + 1):
+                L.set(x, y, p["pier2"] if x >= px + 8 else concrete(x, y, x == px))
 
     def fence(x0, x1):
         for x in range(x0, x1):
@@ -413,7 +536,7 @@ def viaduct_layer(p):
             if x % 8 == 0:
                 L.rect(x, 60, 1, GROUND - 60, p["fence"])
 
-    for a, b in [(15, 56), (88, 138), (300, 368), (392, 418), (500, 558)]:
+    for a, b in [(15, 56), (434, 462)]:
         fence(a, b)
 
     def vending(x, body, body2):
@@ -430,10 +553,11 @@ def viaduct_layer(p):
     vending(60, p["red"], p["red2"])
     vending(70, p["white"], p["white2"])
     L.rect(79, 67, 4, 4, p["bin"])
-    vending(372, p["white"], p["white2"])
-    vending(382, p["red"], p["red2"])
-    L.rect(176, 63, 7, 8, p["white2"])
-    L.rect(177, 64, 5, 1, p["panel"])
+    vending(464, p["white"], p["white2"])
+    vending(474, p["red"], p["red2"])
+    L.rect(483, 67, 4, 4, p["bin"])
+    L.rect(85, 63, 6, 8, p["white2"])              # switch box
+    L.rect(86, 64, 4, 1, p["panel"])
 
     def cone(x):
         L.set(x + 1, 66, p["cone"])
@@ -441,14 +565,14 @@ def viaduct_layer(p):
         L.rect(x, 68, 3, 2, p["cone"])
         L.rect(x - 1, 70, 5, 1, p["cone"])
 
-    for cx in (200, 207, 466, 473, 480):
+    for cx in (100, 107, 224, 231):
         cone(cx)
     # small booth with a window
-    L.rect(226, 60, 40, 11, p["booth"])
-    L.rect(226, 60, 40, 1, p["booth2"])
-    L.rect(232, 62, 14, 7, p["win"])
-    L.rect(250, 62, 3, 5, p["sign"])
-    L.rect(256, 63, 6, 8, p["booth2"])
+    L.rect(508, 60, 40, 11, p["booth"])
+    L.rect(508, 60, 40, 1, p["booth2"])
+    L.rect(514, 62, 14, 7, p["win"])
+    L.rect(532, 62, 3, 5, p["sign"])
+    L.rect(538, 63, 6, 8, p["booth2"])
     return L
 
 
@@ -456,7 +580,7 @@ def glow_layer(p):
     """Night only: light pools in front of the vending machines and the booth window."""
     T = 560
     L = Layer(T)
-    for cx, w in ((70, 26), (239, 22), (382, 26)):
+    for cx, w in ((70, 26), (474, 26), (521, 22)):
         for x in range(cx - w // 2, cx + w // 2):
             for y in range(58, GROUND + 4):
                 if abs(x - cx) / (w / 2) + abs(y - 66) / 9 < 1:
@@ -495,6 +619,7 @@ def build(theme):
         "clouds": (clouds_layer(p), 360),
         "streaks": (streaks_layer(p), 200),
         "hills": (hills_layer(p), 90),
+        "field": (field_layer(p, moonlit=night), 14),
         "poles": (poles_layer(p), 8),
         "viaduct": (viaduct_layer(p), 8),
         "glow": (glow_layer(p), 8),
@@ -540,17 +665,20 @@ def build(theme):
     out.append(scrolling("clouds"))
     out.append(scrolling("streaks"))
     out.append(scrolling("hills"))
+    out.append(scrolling("field"))
     out.append(scrolling("poles"))
     # contact wire (static, it is continuous)
     out.append(f'<rect x="0" y="{WIRE}" width="{GW}" height="1" fill="{p["wire"]}"/>')
-    out.append(draw_train(p).svg())
-    if night:
+    train = draw_train(p)
+    out.append(train.svg())
+    if night:                                      # beam starts at the lamp and passes over the cap
         parts = []
         for k, op in enumerate((".32", ".2", ".11", ".05")):
             beam = Layer()
             for i in range(k * 9, k * 9 + 9):
                 for y in range(LAMP_Y - i // 14, LAMP_Y + 2 + i // 8):
-                    beam.set(HEAD_X + 1 + i, y, p["head"])
+                    if (HEAD_X - 4 + i, y) not in train.px:
+                        beam.set(HEAD_X - 4 + i, y, p["head"])
             parts.append(f'<g opacity="{op}">{beam.svg()}</g>')
         out.append(f'<g class="beam">{"".join(parts)}</g>')
     out.append(scrolling("viaduct"))
