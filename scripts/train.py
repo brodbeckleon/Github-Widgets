@@ -58,7 +58,7 @@ PALETTES = {
         hill=["#141a38", "#11172c", "#1f2140", "#0d1224"],
         tower="#4b5274", tower2="#343a58", pole="#2c2a2c", pole2="#48443e", wire="#56608a",
         body="#c9cdd8", body2="#aeb2c0", roof="#9a9eac", roof2="#5e6274", blue="#2a56ae",
-        blue2="#1c3a80", glass="#ffd877", cabglass="#39456e", door="#aeb2c0", hi="#e9edf6",
+        blue2="#1c3a80", glass="#ffd877", cabglass="#a58c58", door="#aeb2c0", hi="#e9edf6",
         head="#fff6cc", glint="#fffdf0", gap="#262a38", panto="#1c1f28", under="#141c36",
         bogie="#16181e", wheel="#4a4e5a",
         rail_hi="#7a6a78", rail_lo="#5a4e5c", deck="#4a4450", face="#1c1820",
@@ -301,22 +301,22 @@ def poles_layer(p):
 
 # Head of the Series 0, drawn facing left (tip in column 0) and mirrored when stamped.
 # Rows run from two above the roof (horn) to one below the skirt (pilot).
-#   h top edge / window frame   w ivory   s ivory in shade   B blue   D dark blue
-#   g cab glass   L lamp disc   i glint on the lamp   e E crew door edge on ivory / on blue
+#   h lit top edge of the hood   w ivory   s ivory in shade   B blue   D dark blue
+#   g cab glass (raked 45 degrees, unframed)   L lamp disc   i glint on the lamp   e E crew door edge on ivory / on blue
 NOSE = [
     "                    www   ",
     "                    w     ",
-    "                   hhhhhhh",
-    "                hhhwwwwwww",
-    "             hhhhgggwwwwww",
-    "           hhgghggggweweww",
-    "        hhhggghgggggBEBEBB",
-    "     hhhwwwwwwwwwBBBBEgEBB",
-    "   hhwwwwwwwwwwBBBBBBEgEBB",
-    "  hwwwwwwwwwwwwBBBBBBEBEBB",
-    " hwwwwwwwwwwwwwwwBBBBEBEBB",
-    "hwwLiwwwwwwwwwwwwwwwweweww",
+    "                  wwwwwwww",
+    "                 ggggwwwww",
+    "                gggggwwwww",
+    "               ggggggeweww",
+    "        hhhhwwwwwwwwBEBEBB",
+    "    hhhhwwwwwwwwwBBBBEgEBB",
+    "  hhwwwwwwwwwwwBBBBBBEgEBB",
+    " hwwwwwwwwwwwwwBBBBBBEBEBB",
+    "hwwLiwwwwwwwwwwwwBBBBEBEBB",
     "wwwLLwwwwwwwwwwwwwwwweweww",
+    "wwwwwwwwwwwwwwwwwwwwweweww",
     " swwwwwwwwwwwwwwwwwwweweww",
     "  sssssssssssssssssssesess",
     "  BBBBBBBBBBBBBBBBBBBBBBBB",
@@ -328,7 +328,7 @@ NOSE = [row[::-1] for row in NOSE]
 SIDE = "rrwwBBBBBwwwsBBD"                          # one column of the car body, roof to skirt
 HEAD_X = 216                                       # tip of the nose
 CAR = 100                                          # car length
-LAMP_Y = TOP + 9                                   # lamp rows: LAMP_Y, LAMP_Y + 1
+LAMP_Y = TOP + 8                                   # lamp rows: LAMP_Y, LAMP_Y + 1
 
 
 def draw_train(p):
