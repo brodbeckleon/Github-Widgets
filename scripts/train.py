@@ -469,110 +469,128 @@ def field_layer(p, moonlit=False):
     return L
 
 
+TRACK_TILE = 840                                   # wall, embankments and bridges repeat after this
+WALL = 712                                         # the walled-in viaduct runs from here round to x = 96
+BRIDGES = [(250, 418), (574, 686)]                 # through truss bridges; multiples of PANEL long
+PANEL = 28
+TRUSS_TOP = 22                                     # top chord, well above the roof and the catenary
+
+
+def truss(L, x0, x1, dx, dy, lit, mid, dark, wide):
+    """Side of a Warren through truss: inclined end posts, diagonals, top chord and gusset plates."""
+    yb, yt = RAIL + dy, TRUSS_TOP + dy
+    n = (x1 - x0) // PANEL
+    foot = [x0 + dx + k * PANEL for k in range(n + 1)]
+    head = [x0 + dx + PANEL // 2 + k * PANEL for k in range(n)]
+
+    def member(xa, xb):                            # from the bottom chord at xa up to the top chord at xb
+        for y in range(yt + 2, yb):
+            x = round(xa + (xb - xa) * (yb - 1 - y) / (yb - 3 - yt))
+            L.set(x, y, mid)
+            if wide:
+                L.set(x + 1, y, dark)
+
+    for k in range(n):
+        member(foot[k], head[k] - 1)
+        member(foot[k + 1] - 1, head[k])
+    for x in range(head[0] - 2, head[-1] + 3):
+        L.set(x, yt, lit)
+        L.set(x, yt + 1, mid)
+    if wide:
+        for hx in head:                            # gusset plates
+            L.rect(hx - 2, yt + 2, 5, 2, mid)
+        for fx in foot[1:-1]:
+            L.rect(fx - 2, yb - 2, 4, 2, mid)
+
+
+def truss_back_layer(p):
+    """Far side of the truss bridges, behind the train: darker and set back a little."""
+    L = Layer(TRACK_TILE)
+    st = p["steel"]
+    for x0, x1 in BRIDGES:
+        truss(L, x0, x1, 4, -2, st[0], st[2], st[2], False)
+        for k in range((x1 - x0) // PANEL):        # struts across to the near top chord
+            hx = x0 + PANEL // 2 + k * PANEL
+            L.set(hx + 3, TRUSS_TOP - 1, st[2])
+            L.set(hx + 2, TRUSS_TOP - 1, st[2])
+    return L
+
+
 def viaduct_layer(p):
-    """What carries the track, one stretch after the other: a walled-in viaduct (vending machines,
-    fence, booth), open spans on T-piers, an arch viaduct, a grass embankment and a steel truss bridge."""
-    T = 840
+    """What carries the track: a walled-in viaduct (vending machines, fence, booth), grass
+    embankments, and steel through truss bridges that rise above the train."""
+    T = TRACK_TILE
     L = Layer(T)
-    BANK, STEEL, WALL = (430, 556), (564, 712), 712        # wall runs from WALL round to x = 96
     bk, st = p["bank"], p["steel"]
 
     def concrete(x, y, edge=False):
         return p["pier3"] if edge else p["pier2"] if hsh(x, y // 2) < 0.3 else p["pier"]
 
-    def block(x0, x1, y0=DECK + 4):
+    def block(x0, x1, y0=DECK + 1):
         for x in range(x0, x1):
             for y in range(y0, GROUND + 1):
                 L.set(x, y, concrete(x, y, x == x0))
 
     for x in range(T):
+        if any(a <= x < b for a, b in BRIDGES):    # bridge deck: a shallow plate girder, open below
+            L.set(x, RAIL, st[1])
+            L.rect(x, DECK, 1, 3, st[2] if x % 7 == 3 else st[0])
+            L.set(x, DECK + 3, st[2])
+            continue
         # low parapet in front of the wheels, with a joint every few pixels
         L.set(x, RAIL, p["rail_lo"] if x % 7 == 0 else p["rail_hi"])
-        if BANK[0] <= x < BANK[1]:                 # embankment: ballast, then the grass slope
-            L.set(x, DECK, p["deck"])
-            for y in range(DECK + 1, GROUND + 1):
-                r, d = hsh(x, y, 5), y - DECK
-                if d == 1:
-                    c = bk[3] if r < 0.6 else bk[0]
-                elif d < 6:
-                    c = bk[0] if r < 0.72 else bk[3] if r < 0.84 else bk[1]
-                elif d < 12:
-                    c = bk[1] if r < 0.7 else bk[0] if r < 0.84 else bk[2]
-                else:
-                    c = bk[2] if r < 0.72 else bk[1]
-                if 3 < d < 15 and hsh(x, y, 9) < 0.014:
-                    c = p["flower"][hsh(x, y, 10) < 0.5]
-                L.set(x, y, c)
-            continue
-        if STEEL[0] <= x < STEEL[1]:               # steel bridge: chords now, web below
-            L.set(x, DECK, st[1])
-            L.set(x, DECK + 1, st[0])
-            continue
         L.set(x, DECK, p["deck"])
-        L.rect(x, DECK + 1, 1, 2, p["face"])
-        L.set(x, DECK + 3, p["shadow"])
-        if x >= WALL or x < 96:                    # back wall in the shade of the deck
+        if x >= WALL or x < 96:                    # viaduct deck and the back wall in its shade
+            L.rect(x, DECK + 1, 1, 2, p["face"])
+            L.set(x, DECK + 3, p["shadow"])
             for y in range(DECK + 4, GROUND):
                 L.set(x, y, p["wall2"] if y < DECK + 7 or hsh(x // 3, y // 4) < 0.25 else p["wall"])
             L.set(x, GROUND, p["ground"])
-    for x in range(140, 222):                      # hazard stripes on the girder over the lane
-        if x % 5 < 2:
-            L.set(x, DECK + 3, p["hazard"])
+            continue
+        for y in range(DECK + 1, GROUND + 1):      # embankment: ballast on top, then the grass slope
+            r, d = hsh(x, y, 5), y - DECK
+            if d == 1:
+                c = bk[3] if r < 0.6 else bk[0]
+            elif d < 6:
+                c = bk[0] if r < 0.72 else bk[3] if r < 0.84 else bk[1]
+            elif d < 12:
+                c = bk[1] if r < 0.7 else bk[0] if r < 0.84 else bk[2]
+            else:
+                c = bk[2] if r < 0.72 else bk[1]
+            if 3 < d < 15 and hsh(x, y, 9) < 0.014:
+                c = p["flower"][hsh(x, y, 10) < 0.5]
+            L.set(x, y, c)
 
     for px in (0, WALL + 60):                      # pilasters in the wall
         for x in range(px, px + 14):
             for y in range(DECK + 4, GROUND):
                 L.set(x, y, concrete(x, y, x == px))
     block(92, 96)                                  # where the wall ends
-    block(WALL, WALL + 4, DECK + 1)
-    for px in (140, 210):                          # T-piers of the open spans
-        for x in range(px - 4, px + 14):
-            L.set(x, DECK + 4, concrete(x, DECK + 4, x == px - 4))
-        for x in range(px - 2, px + 12):
-            L.set(x, DECK + 5, concrete(x, DECK + 5, x == px - 2))
-        for x in range(px, px + 10):
-            for y in range(DECK + 6, GROUND + 1):
-                L.set(x, y, p["pier2"] if x >= px + 8 else concrete(x, y, x == px))
+    block(WALL, WALL + 4)
 
-    # arch viaduct: two spans, the fields show through
-    for a in (290, 360):
-        for x in range(a, a + 60):
-            u = (x - a - 29.5) / 30
-            crown = max(DECK + 5, 69 - round(10 * math.sqrt(max(0.0, 1 - u * u))))
-            for y in range(DECK + 4, crown):
-                L.set(x, y, concrete(x, y, y == crown - 1))
-    for px in (280, 350, 420):
-        for x in range(px, px + 10):
-            for y in range(DECK + 4, GROUND + 1):
-                L.set(x, y, p["pier2"] if x >= px + 8 else concrete(x, y, x == px))
-
-    # embankment: steps up the slope and bushes at its foot
-    for y in range(DECK + 1, GROUND + 1):
-        L.set(497, y, p["pier3"])
-        L.set(498, y, p["pier3"] if y % 2 else p["pier2"])
-        L.set(499, y, p["pier"] if y % 2 else p["pier2"])
-    for cx, r in ((446, 3), (452, 2), (474, 4), (520, 3), (527, 4), (544, 2)):
+    # embankment: steps up the slope, a small underpass and bushes at its foot
+    for sx in (168, 470):
+        for y in range(DECK + 1, GROUND + 1):
+            L.set(sx, y, p["pier3"])
+            L.set(sx + 1, y, p["pier3"] if y % 2 else p["pier2"])
+            L.set(sx + 2, y, p["pier"] if y % 2 else p["pier2"])
+    L.rect(516, 60, 16, 12, p["pier"])
+    L.rect(516, 60, 16, 1, p["pier3"])
+    L.rect(516, 60, 1, 12, p["pier3"])
+    L.rect(519, 63, 10, 9, p["shadow"])
+    for cx, r in ((112, 3), (119, 2), (142, 4), (196, 3), (232, 2), (432, 3), (448, 2), (456, 4),
+                  (492, 3), (546, 4), (556, 2), (697, 3), (704, 2)):
         for dy in range(-r, 1):
             for dx in range(-r - 1, r + 2):
                 if (dx / (r + 1.5)) ** 2 + (dy / r) ** 2 <= 1:
                     lit = -0.6 * dx / (r + 1.5) - 0.8 * dy / r
                     L.set(cx + dx, GROUND + dy, p["tree"][2] if lit > 0.75 else p["tree"][0] if lit > 0.3 else p["tree"][1])
 
-    # steel bridge: Warren truss under the deck, on two abutments and a pier
-    block(BANK[1], STEEL[0], DECK + 1)
-    for x in range(BANK[1], STEEL[0]):
-        L.set(x, DECK, p["deck"])
-    PANEL, MID = 14, (634, 642)
-    for x in range(*STEEL):
-        if MID[0] <= x < MID[1]:
-            continue
-        t = (x - (STEEL[0] if x < MID[0] else MID[1])) % PANEL
-        if t == 0:
-            L.rect(x, DECK + 2, 1, 7, st[2])       # vertical at each panel point
-        L.set(x, DECK + 2 + (t if t < PANEL // 2 else PANEL - 1 - t), st[0])
-        L.set(x, DECK + 9, st[0])
-        L.set(x, DECK + 10, st[2])
-    block(MID[0], MID[1], DECK + 2)
+    # steel bridges: abutments, then the near truss in front of the train
+    for x0, x1 in BRIDGES:
+        block(x0 - 8, x0)
+        block(x1, x1 + 8)
+        truss(L, x0, x1, 0, 0, st[1], st[0], st[2], True)
 
     def fence(x0, x1):
         for x in range(x0, x1):
@@ -613,7 +631,7 @@ def viaduct_layer(p):
         L.rect(x, 68, 3, 2, p["cone"])
         L.rect(x - 1, 70, 5, 1, p["cone"])
 
-    for cx in (100, 107, 224, 231):
+    for cx in (100, 107):
         cone(cx)
     # small booth with a window
     bx = WALL + 78
@@ -627,9 +645,9 @@ def viaduct_layer(p):
 
 def glow_layer(p):
     """Night only: light pools in front of the vending machines and the booth window."""
-    T = 840
+    T = TRACK_TILE
     L = Layer(T)
-    for cx, w in ((70, 26), (756, 26), (803, 22)):
+    for cx, w in ((70, 26), (WALL + 44, 26), (WALL + 91, 22)):
         for x in range(cx - w // 2, cx + w // 2):
             for y in range(58, GROUND + 4):
                 if abs(x - cx) / (w / 2) + abs(y - 66) / 9 < 1:
@@ -670,7 +688,8 @@ def build(theme):
         "hills": (hills_layer(p), 90),
         "field": (field_layer(p, moonlit=night), 14),
         "poles": (poles_layer(p), 8),
-        "viaduct": (viaduct_layer(p), 12),         # 840 px tile, same 70 px/s as the poles
+        "truss": (truss_back_layer(p), 12),        # 840 px tiles, same 70 px/s as the poles
+        "viaduct": (viaduct_layer(p), 12),
         "glow": (glow_layer(p), 12),
         "grass": (grass_layer(p), 3.6),
     }
@@ -716,6 +735,7 @@ def build(theme):
     out.append(scrolling("hills"))
     out.append(scrolling("field"))
     out.append(scrolling("poles"))
+    out.append(scrolling("truss"))
     # contact wire (static, it is continuous)
     out.append(f'<rect x="0" y="{WIRE}" width="{GW}" height="1" fill="{p["wire"]}"/>')
     train = draw_train(p)
