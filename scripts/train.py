@@ -48,7 +48,7 @@ PALETTES = {
         house=["#d6cbb6", "#56464e", "#3d3b6c"],
         bank=["#93a65a", "#7f934c", "#6b8142", "#b9c06c"],              # grass slope, top to foot, tufts
         steel=["#a5523e", "#c87052", "#6f3528"],                        # girder, lit edge, shade
-        flower=["#f4f0e2", "#d2b84e"],
+        flower=["#f4f0e2", "#d2b84e"], road=["#5c5b68", "#787682", "#e4dccc"],   # asphalt, edge, markings
         grass=["#836a3c", "#6e5832", "#a08a54", "#5a482a", "#b49c62"],
     ),
     "dark": dict(
@@ -76,7 +76,7 @@ PALETTES = {
         house=["#4c4c5c", "#20202c", "#ffd36b"],
         bank=["#2e3e32", "#27352c", "#1f2c26", "#3f4f3a"],
         steel=["#4f2c28", "#683a32", "#30191a"],
-        flower=["#5c6c60", "#4c5236"],
+        flower=["#5c6c60", "#4c5236"], road=["#23232c", "#32323c", "#7c7a70"],
         grass=["#3a3220", "#2e2819", "#4a4028", "#241f14", "#55492e"],
     ),
 }
@@ -471,7 +471,8 @@ def field_layer(p, moonlit=False):
 
 TRACK_TILE = 840                                   # wall, embankments and bridges repeat after this
 WALL = 712                                         # the walled-in viaduct runs from here round to x = 96
-BRIDGES = [(250, 418), (574, 686)]                 # through truss bridges; multiples of PANEL long
+BRIDGES = [(250, 418), (574, 686)]                 # long: through truss bridges; multiples of PANEL long
+UNDERPASSES = [(146, 194), (488, 522)]             # short: girder bridges over a lane through the embankment
 PANEL = 28
 TRUSS_TOP = 22                                     # top chord, well above the roof and the catenary
 
@@ -518,7 +519,8 @@ def truss_back_layer(p):
 
 def viaduct_layer(p):
     """What carries the track: a walled-in viaduct (vending machines, fence, booth), grass
-    embankments, and steel through truss bridges that rise above the train."""
+    embankments, short girder bridges over underpasses, and long steel through truss bridges
+    that rise above the train."""
     T = TRACK_TILE
     L = Layer(T)
     bk, st = p["bank"], p["steel"]
@@ -540,6 +542,11 @@ def viaduct_layer(p):
         # low parapet in front of the wheels, with a joint every few pixels
         L.set(x, RAIL, p["rail_lo"] if x % 7 == 0 else p["rail_hi"])
         L.set(x, DECK, p["deck"])
+        if any(a <= x < b for a, b in UNDERPASSES):    # short bridge: girder with warning stripes
+            L.rect(x, DECK + 1, 1, 2, p["face"])
+            L.set(x, DECK + 3, p["hazard"] if x % 5 < 2 else p["shadow"])
+            L.set(x, DECK + 4, p["shadow"])
+            continue
         if x >= WALL or x < 96:                    # viaduct deck and the back wall in its shade
             L.rect(x, DECK + 1, 1, 2, p["face"])
             L.set(x, DECK + 3, p["shadow"])
@@ -568,18 +575,33 @@ def viaduct_layer(p):
     block(92, 96)                                  # where the wall ends
     block(WALL, WALL + 4)
 
-    # embankment: steps up the slope, a small underpass and bushes at its foot
-    for sx in (168, 470):
+    # short bridges: abutments, clearance sign and the lane running through to the fields
+    rd = p["road"]
+    for x0, x1 in UNDERPASSES:
+        block(x0 - 6, x0)
+        block(x1, x1 + 6)
+        for y in range(DECK + 5, GROUND + 1):      # inner faces of the abutments in shade
+            L.set(x0, y, p["shadow"])
+            L.set(x1 - 1, y, p["pier2"])
+        mid, half = (x0 + x1) / 2, (x1 - x0) / 2
+        L.rect(int(mid) - 3, DECK + 1, 6, 2, p["sign"])
+        L.rect(int(mid) - 2, DECK + 1, 4, 1, p["red"])
+        for y in range(62, GROUND + 1):
+            w = half * (0.34 + 0.6 * (y - 62) / (GROUND - 62))
+            for x in range(round(mid - w), round(mid + w)):
+                edge = x in (round(mid - w), round(mid + w) - 1)
+                L.set(x, y, rd[1] if edge else rd[0])
+            if y % 4 < 2:
+                L.set(int(mid), y, rd[2])
+
+    # embankment: steps up the slope and bushes at its foot
+    for sx in (222, 468):
         for y in range(DECK + 1, GROUND + 1):
             L.set(sx, y, p["pier3"])
             L.set(sx + 1, y, p["pier3"] if y % 2 else p["pier2"])
             L.set(sx + 2, y, p["pier"] if y % 2 else p["pier2"])
-    L.rect(516, 60, 16, 12, p["pier"])
-    L.rect(516, 60, 16, 1, p["pier3"])
-    L.rect(516, 60, 1, 12, p["pier3"])
-    L.rect(519, 63, 10, 9, p["shadow"])
-    for cx, r in ((112, 3), (119, 2), (142, 4), (196, 3), (232, 2), (432, 3), (448, 2), (456, 4),
-                  (492, 3), (546, 4), (556, 2), (697, 3), (704, 2)):
+    for cx, r in ((112, 3), (119, 2), (131, 4), (208, 3), (234, 2), (432, 3), (448, 2), (456, 4),
+                  (536, 3), (546, 4), (556, 2), (697, 3), (704, 2)):
         for dy in range(-r, 1):
             for dx in range(-r - 1, r + 2):
                 if (dx / (r + 1.5)) ** 2 + (dy / r) ** 2 <= 1:
